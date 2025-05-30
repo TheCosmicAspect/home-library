@@ -1,5 +1,3 @@
-# models/models.py
-
 from . import db
 from sqlalchemy.sql import func
 
