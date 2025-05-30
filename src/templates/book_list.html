@@ -1,0 +1,75 @@
+{% extends "base.html" %}
+
+{% block title %}Books - {{ super() }}{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h1>Books</h1>
+    <a href="{{ url_for('books.book_add') }}" class="btn btn-success">Add New Book</a>
+</div>
+
+{% if books %}
+<div class="table-responsive">
+    <table class="table table-striped">
+        <thead>
+            <tr>
+                <th>Title</th>
+                <th>ISBN</th>
+                <th>Authors</th>
+                <th>Tags</th>
+                <th>Location</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for book in books %}
+            <tr>
+                <td><a href="{{ url_for('books.book_detail', id=book.id) }}">{{ book.title }}</a></td>
+                <td>{{ book.isbn }}</td>
+                <td>
+                    {% for author in book.authors %}
+                    <a href="{{ url_for('authors.author_detail', id=author.id) }}" class="badge bg-primary text-decoration-none">{{ author.name }}</a>
+                    {% endfor %}
+                </td>
+                <td>
+                    {% for tag in book.tags %}
+                    <span class="badge bg-secondary">{{ tag.label }}</span>
+                    {% endfor %}
+                </td>
+                <td>{{ book.location.name }}</td>
+                <td>
+                    <a href="{{ url_for('books.book_edit', id=book.id) }}" class="btn btn-sm btn-primary">Edit</a>
+                    <button class="btn btn-sm btn-danger" data-bs-toggle="modal" data-bs-target="#deleteModal{{ book.id }}">Delete</button>
+                    
+                    <!-- Delete Modal -->
+                    <div class="modal fade" id="deleteModal{{ book.id }}" tabindex="-1" aria-hidden="true">
+                        <div class="modal-dialog">
+                            <div class="modal-content">
+                                <div class="modal-header">
+                                    <h5 class="modal-title">Confirm Delete</h5>
+                                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                </div>
+                                <div class="modal-body">
+                                    Are you sure you want to delete "{{ book.title }}"?
+                                </div>
+                                <div class="modal-footer">
+                                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                                    <form action="{{ url_for('books.book_delete', id=book.id) }}" method="post">
+                                        <button type="submit" class="btn btn-danger">Delete</button>
+                                    </form>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% else %}
+<div class="alert alert-info">
+    No books found. <a href="{{ url_for('books.book_add') }}">Add your first book</a>.
+</div>
+{% endif %}
+{% endblock %}

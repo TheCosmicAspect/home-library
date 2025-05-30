@@ -1,0 +1,37 @@
+{% extends "base.html" %}
+
+{% block title %}Places - {{ super() }}{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h1>Places</h1>
+    <a href="{{ url_for('places.place_add') }}" class="btn btn-success">Add New Place</a>
+</div>
+
+{% if places %}
+<div class="table-responsive">
+    <table class="table table-striped">
+        <thead>
+            <tr>
+                <th>Place</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for place in places %}
+            <tr>
+                <td><a href="{{ url_for('places.place_detail', id=place.id) }}">{{ place.name }}</a></td>
+                <td>
+                    <a href="{{ url_for('places.place_detail', id=place.id) }}" class="btn btn-sm btn-info">View</a>
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% else %}
+<div class="alert alert-info">
+    No places found. <a href="{{ url_for('places.place_add') }}">Add your first place</a>.
+</div>
+{% endif %}
+{% endblock %}

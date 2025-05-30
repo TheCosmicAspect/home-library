@@ -1,0 +1,31 @@
+{% extends "base.html" %}
+
+{% block title %}{{ title }} - {{ super() }}{% endblock %}
+
+{% block content %}
+<h1>{{ title }}</h1>
+
+<form method="POST" class="mt-4">
+    {{ form.hidden_tag() }}
+        
+    <div class="mb-3">
+        {{ form.name.label(class="form-label") }}
+        {{ form.name(class="form-control", rows=1) }}
+    </div>
+
+    <div class="mb-3">
+        {{ form.notes.label(class="form-label") }}
+        {{ form.notes(class="form-control", rows=5) }}
+    </div>
+
+    <div class="mb-3">
+        {{ form.place.label(class="form-label") }}
+        {{ form.place(class="form-select", multiple=false, size=5) }}
+    </div>
+    
+    <div class="mb-3">
+        {{ form.submit(class="btn btn-primary") }}
+        <a href="{{ url_for('locations.location_list') }}" class="btn btn-secondary">Cancel</a>
+    </div>
+</form>
+{% endblock %}

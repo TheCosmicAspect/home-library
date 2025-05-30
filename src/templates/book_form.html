@@ -1,0 +1,87 @@
+{% extends "base.html" %}
+
+{% block title %}{{ title }} - {{ super() }}{% endblock %}
+
+{% block content %}
+<h1>{{ title }}</h1>
+
+<form method="POST" class="mt-4">
+    {{ form.hidden_tag() }}
+    
+    <div class="mb-3">
+        {{ form.title.label(class="form-label") }}
+        {{ form.title(class="form-control") }}
+        {% if form.title.errors %}
+            {% for error in form.title.errors %}
+                <div class="text-danger">{{ error }}</div>
+            {% endfor %}
+        {% endif %}
+    </div>
+    
+    <div class="mb-3">
+        {{ form.isbn.label(class="form-label") }}
+        {{ form.isbn(class="form-control") }}
+        {% if form.isbn.errors %}
+            {% for error in form.isbn.errors %}
+                <div class="text-danger">{{ error }}</div>
+            {% endfor %}
+        {% endif %}
+    </div>
+
+    <div class="mb-3">
+        {{ form.authors.label(class="form-label") }}
+        {{ form.authors(class="form-select tom-select", multiple=true, placeholder="Search authors...") }}
+    </div>
+    
+    <div class="mb-3">
+        {{ form.description.label(class="form-label") }}
+        {{ form.description(class="form-control") }}
+    </div>
+
+    <div class="mb-3">
+        {{ form.location.label(class="form-label") }}
+        {{ form.location(class="form-control tom-select") }}
+    </div>
+    
+    <div class="mb-3">
+        {{ form.tags.label(class="form-label") }}
+        {{ form.tags(class="form-select tom-select", multiple=true, placeholder="Search tags...") }}
+    </div>
+
+    <div class="mb-3">
+        {{ form.cover_url.label(class="form-label") }}
+        {{ form.cover_url(class="form-control") }}
+    </div>
+
+    <div class="mb-3">
+        {{ form.owner.label(class="form-label") }}
+        {{ form.owner(class="form-control tom-select") }}
+    </div>
+    
+    <div class="mb-3">
+        {{ form.submit(class="btn btn-primary") }}
+        <a href="{{ url_for('books.book_list') }}" class="btn btn-secondary">Cancel</a>
+    </div>
+</form>
+
+<!-- Tom Select CSS -->
+<link href="https://cdnjs.cloudflare.com/ajax/libs/tom-select/2.2.2/css/tom-select.bootstrap5.min.css" rel="stylesheet">
+
+<!-- Tom Select JavaScript -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/tom-select/2.2.2/js/tom-select.complete.min.js"></script>
+
+<!-- Tom Select & ISBN autofill scripts -->
+<script src="../static/js/book_form.js"></script>
+
+<style>
+/* Custom styling to match Bootstrap form controls */
+.ts-wrapper.form-select {
+    min-height: calc(1.5em + 0.75rem + 2px);
+}
+
+.ts-wrapper.multi .ts-control {
+    min-height: calc(1.5em + 0.75rem + 2px);
+}
+</style>
+
+{% endblock %}

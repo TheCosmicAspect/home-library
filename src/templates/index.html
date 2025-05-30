@@ -1,0 +1,80 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="jumbotron">
+    <h1 class="display-4">Welcome to the Harmsi Library</h1>
+    <p class="lead">Manage books, authors, etc.</p>
+    <hr class="my-4">
+    <p>You can add, edit, and organize your books, authors, and tags.</p>
+    <div class="mt-4">
+        <a href="{{ url_for('books.book_list') }}" class="btn btn-primary btn-lg">View Books</a>
+        <a href="{{ url_for('books.book_add') }}" class="btn btn-success btn-lg">Add New Book</a>
+    </div>
+</div>
+
+<div class="row mt-5">
+    <div class="col-md-3">
+        <div class="card">
+            <div class="card-body">
+                <h5 class="card-title">Books</h5>
+                <p class="card-text">Manage your book collection.</p>
+                <a href="{{ url_for('books.book_list') }}" class="btn btn-primary">View Books</a>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card">
+            <div class="card-body">
+                <h5 class="card-title">Authors</h5>
+                <p class="card-text">Manage your authors.</p>
+                <a href="{{ url_for('authors.author_list') }}" class="btn btn-primary">View Authors</a>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card">
+            <div class="card-body">
+                <h5 class="card-title">Tags</h5>
+                <p class="card-text">Organize your books with tags.</p>
+                <a href="{{ url_for('tags.tag_list') }}" class="btn btn-primary">View Tags</a>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card">
+            <div class="card-body">
+                <h5 class="card-title">Places</h5>
+                <p class="card-text">Manage your book locations.</p>
+                <a href="{{ url_for('locations.location_list') }}" class="btn btn-primary">View Locations</a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    <h2 class="display-4">Recent additions</h2>
+    {% for book in books %}
+    <div class="col-md-3">
+        <a href="{{ url_for('books.book_detail', id=book.id) }}" class="card text-decoration-none text-body">
+            <img src="{{ book.cover_url }}" class="card-img-top">
+            <div class="card-body">
+                <h4 class="card-title">{{ book.title }}</h5>
+                {% if book.location %}
+                <h5 class="card-subtitle">{{ book.location.name }}</h5>
+                {% endif %}
+
+                {% if book.description %}
+                <p class="card-text">{{ book.description|truncate(50) }}</p>
+                {% else %}
+                <p class="card-text">There is no description for this book.</p>
+                {% endif %}
+
+                {% for author in book.authors %}
+                <a href="{{ url_for('authors.author_detail', id=author.id) }}" class="badge bg-primary text-decoration-none card-text">{{ author.name }}</a>
+                {% endfor %}
+            </div>
+        </a>
+    </div>
+    {% endfor %}
+</div>
+{% endblock %}

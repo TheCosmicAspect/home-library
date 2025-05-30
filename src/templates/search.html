@@ -1,0 +1,203 @@
+<!-- templates/search.html -->
+{% extends "base.html" %}
+
+{% block title %}Search Books - Harmsi Library{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-md-8 mx-auto">
+        <h1 class="text-center mb-4">Search Books</h1>
+        
+        <!-- Search Input -->
+        <div class="input-group mb-4">
+            <input type="text" 
+                   id="searchInput" 
+                   class="form-control form-control-lg" 
+                   placeholder="Search books by title, author, tags, location, ISBN, or description..."
+                   autocomplete="off">
+            <span class="input-group-text">
+                <i class="fas fa-search"></i>
+            </span>
+        </div>
+        
+        <!-- Loading indicator -->
+        <div id="loadingIndicator" class="text-center mb-3" style="display: none;">
+            <div class="spinner-border text-primary" role="status">
+                <span class="visually-hidden">Loading...</span>
+            </div>
+        </div>
+        
+        <!-- Results count -->
+        <div id="resultsCount" class="mb-3 text-muted" style="display: none;"></div>
+        
+        <!-- Results container -->
+        <div id="resultsContainer" class="row">
+            <div class="col-12 text-center text-muted">
+                <p>Start typing to search for books...</p>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<style>
+    .book-card {
+        transition: transform 0.2s, box-shadow 0.2s;
+        cursor: pointer;
+        text-decoration: none;
+        color: inherit;
+        display: block;
+    }
+    .book-card:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 8px rgba(0,0,0,0.3);
+        text-decoration: none;
+        color: inherit;
+    }
+    .highlight {
+        background-color: rgba(255, 193, 7, 0.3);
+        font-weight: bold;
+        padding: 1px 2px;
+        border-radius: 2px;
+    }
+    .loading {
+        opacity: 0.6;
+    }
+    .badge {
+        font-size: 0.75em;
+    }
+</style>
+
+<script>
+    let searchTimeout;
+    const searchInput = document.getElementById('searchInput');
+    const resultsContainer = document.getElementById('resultsContainer');
+    const loadingIndicator = document.getElementById('loadingIndicator');
+    const resultsCount = document.getElementById('resultsCount');
+
+    // Debounced search function
+    function performSearch(query) {
+        if (query.trim() === '') {
+            resultsContainer.innerHTML = `
+                <div class="col-12 text-center text-muted">
+                    <p>Start typing to search for books...</p>
+                </div>
+            `;
+            resultsCount.style.display = 'none';
+            return;
+        }
+
+        // Show loading
+        loadingIndicator.style.display = 'block';
+        resultsContainer.classList.add('loading');
+
+        fetch(`/api/search?q=${encodeURIComponent(query)}`)
+            .then(response => response.json())
+            .then(data => {
+                displayResults(data.books, query);
+            })
+            .catch(error => {
+                console.error('Search error:', error);
+                resultsContainer.innerHTML = `
+                    <div class="col-12">
+                        <div class="alert alert-danger">
+                            An error occurred while searching. Please try again.
+                        </div>
+                    </div>
+                `;
+            })
+            .finally(() => {
+                loadingIndicator.style.display = 'none';
+                resultsContainer.classList.remove('loading');
+            });
+    }
+
+    // Display search results
+    function displayResults(books, query) {
+        const count = books.length;
+        
+        // Update results count
+        if (count > 0) {
+            resultsCount.innerHTML = `Found ${count} book${count !== 1 ? 's' : ''}`;
+            resultsCount.style.display = 'block';
+        } else {
+            resultsCount.style.display = 'none';
+        }
+
+        if (count === 0) {
+            resultsContainer.innerHTML = `
+                <div class="col-12 text-center text-muted">
+                    <p>No books found matching "${query}"</p>
+                </div>
+            `;
+            return;
+        }
+
+        let html = '';
+        books.forEach(book => {
+            const authors = book.authors && book.authors.length > 0 ? 
+                book.authors.map(a => a.name || '').join(', ') : '';
+            const tags = book.tags && book.tags.length > 0 ? 
+                book.tags.map(t => `<span class="badge bg-secondary me-1">${highlightText(String(t.label || ''), query)}</span>`).join('') : '';
+            const location = book.location && book.location.name ? String(book.location.name) : 'No location';
+            const description = book.description ? 
+                (book.description.length > 150 ? book.description.substring(0, 150) + '...' : book.description) : 
+                'No description available';
+
+            html += `
+                <div class="col-md-6 mb-4">
+                    <a href="/books/${book.id}" class="book-card">
+                        <div class="card h-100">
+                            ${book.cover_url ? `
+                                <img src="${book.cover_url}" class="card-img-top" alt="${book.title || ''}" style="height: 200px; object-fit: cover;">
+                            ` : ''}
+                            <div class="card-body">
+                                <h5 class="card-title">${highlightText(String(book.title || ''), query)}</h5>
+                                <p class="card-text">
+                                    ${authors ? `<strong>Authors:</strong> ${highlightText(String(authors), query)}<br>` : ''}
+                                    <strong>Location:</strong> ${highlightText(String(location), query)}<br>
+                                    ${book.isbn ? `<strong>ISBN:</strong> ${highlightText(String(book.isbn), query)}<br>` : ''}
+                                    <small class="text-muted">${highlightText(String(description), query)}</small>
+                                </p>
+                                ${tags ? `<div class="mt-2">${tags}</div>` : ''}
+                            </div>
+                        </div>
+                    </a>
+                </div>
+            `;
+        });
+
+        resultsContainer.innerHTML = html;
+    }
+
+    // Highlight matching text
+    function highlightText(text, query) {
+        if (!text || !query || typeof text !== 'string') return text || '';
+        
+        const regex = new RegExp(`(${escapeRegex(query)})`, 'gi');
+        return text.replace(regex, '<span class="highlight">$1</span>');
+    }
+
+    // Escape special regex characters
+    function escapeRegex(string) {
+        return string.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+    }
+
+    // Event listener for search input
+    searchInput.addEventListener('input', function() {
+        const query = this.value;
+        
+        // Clear previous timeout
+        clearTimeout(searchTimeout);
+        
+        // Set new timeout for debounced search
+        searchTimeout = setTimeout(() => {
+            performSearch(query);
+        }, 300); // Wait 300ms after user stops typing
+    });
+
+    // Focus on search input when page loads
+    searchInput.focus();
+</script>
+{% endblock %}

@@ -1,0 +1,65 @@
+{% extends "base.html" %}
+
+{% block title %}{{ author.name }} - {{ super() }}{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h1>{{ author.name }}</h1>
+    <div>
+        <a href="{{ url_for('authors.author_edit', id=author.id) }}" class="btn btn-primary">Edit</a>
+        <button class="btn btn-danger" data-bs-toggle="modal" data-bs-target="#deleteModal">Delete</button>
+    </div>
+</div>
+
+<h3 class="mt-4">Books by this author</h3>
+
+{% if author.books.count() > 0 %}
+<div class="list-group mt-3">
+    {% for book in author.books %}
+    <a href="{{ url_for('books.book_detail', id=book.id) }}" class="list-group-item list-group-item-action">
+        <div class="d-flex w-100 justify-content-between">
+            <h5 class="mb-1">{{ book.title }}</h5>
+            <small>ISBN: {{ book.isbn }}</small>
+        </div>
+        {% if book.description %}
+        <p class="mb-1">{{ book.description|truncate(100) }}</p>
+        {% endif %}
+        <small>
+            {% for tag in book.tags %}
+            <span class="badge bg-secondary">{{ tag.label }}</span>
+            {% endfor %}
+        </small>
+    </a>
+    {% endfor %}
+</div>
+{% else %}
+<div class="alert alert-info mt-3">
+    No books found for this author.
+</div>
+{% endif %}
+
+<div class="mt-4">
+    <a href="{{ url_for('authors.author_list') }}" class="btn btn-secondary">Back to Authors</a>
+</div>
+
+<!-- Delete Modal -->
+<div class="modal fade" id="deleteModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Confirm Delete</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                Are you sure you want to delete "{{ author.name }}"? This will remove information from {{ author.books.count() }} books.
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                <form action="{{ url_for('authors.author_delete', id=author.id) }}" method="post">
+                    <button type="submit" class="btn btn-danger">Delete</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
