@@ -13,4 +13,4 @@ As this is still under development, detailed installation instructions are not g
 - Run `python app.py` and connect locally
 **Congrats! If you know how to do that, you're all set!**
 ## Anything else?
-If I missed something important, let me know over discord (@thecosmicaspect). Else, hold on. This will be finished soon.
+If I missed something important, for now, just hold on. This will be finished soon.
