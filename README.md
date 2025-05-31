@@ -10,6 +10,13 @@ As this is still under development, detailed installation instructions are not g
 - Set up a database with the schema provided by [db.sql](db.sql)
 - Download the files in [src/](src/) to the desired directory
 - Install the required libraries with `pip install flask flask-sqlalchemy dotenv psycop2 config flask-wtf requests`
+- Create a `.env` file with the following information:
+```
+FLASK_APP=app.py
+FLASK_ENV=development
+DATABASE_URL=postgresql://{username}:{password}@localhost:{port}/{database name}
+SECRET_KEY={type a whole bunch of random characters here}
+```
 - Run `python app.py` and connect locally
 **Congrats! If you know how to do that, you're all set!**
 ## Anything else?
