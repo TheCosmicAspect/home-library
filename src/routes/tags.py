@@ -1,4 +1,4 @@
-from flask import Blueprint, render_template, redirect, url_for, flash
+from flask import Blueprint, render_template, redirect, url_for, flash, request
 from models import db
 from models.models import Tag
 from forms.forms import TagForm
@@ -30,7 +30,21 @@ def tag_add():
 
 @tags_bp.route('/<int:id>/edit', methods=['GET', 'POST'])
 def tag_edit(id):
-    form = TagForm()
+    tag = Tag.query.get_or_404(id)
+    form = TagForm(obj=tag)
+
+    if request.method == 'GET':
+        form.label.data = tag.label
+        form.description = tag.description
+
+    if form.validate_on_submit():
+        tag.label = form.label.data
+        tag.description = form.description.data
+        
+        db.session.commit()
+        flash('Tag updated successfully!', 'success')
+        return redirect(url_for('tags.tag_detail', id=tag.id))
+
     return render_template('tag_form.html', form=form, title='Edit Tag')
 
 @tags_bp.route('/<int:id>/delete', methods=['POST'])

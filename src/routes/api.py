@@ -1,4 +1,5 @@
 from flask import Blueprint, request, jsonify
+from models import db
 from models.models import Book, Author, Tag, Location
 from sqlalchemy import or_, cast, String
 import requests
@@ -124,3 +125,175 @@ def isbn_lookup(isbn):
         
     except Exception as e:
         return jsonify({'success': False, 'error': str(e)})
+    
+@api_bp.route('/authors', methods=['POST'])
+def create_author():
+    """Create a single author"""
+    try:
+        data = request.get_json()
+        name = data.get('name', '').strip()
+        bio = data.get('bio', '').strip()
+        
+        if not name:
+            return jsonify({'success': False, 'message': 'Author name is required'}), 400
+        
+        # Check if author already exists
+        existing_author = Author.query.filter_by(name=name).first()
+        if existing_author:
+            return jsonify({'success': False, 'message': 'Author already exists'}), 400
+        
+        # Create new author
+        author = Author(name=name, bio=bio if bio else None)
+        db.session.add(author)
+        db.session.commit()
+        
+        return jsonify({
+            'success': True,
+            'author': {
+                'id': author.id,
+                'name': author.name,
+                'bio': author.bio
+            }
+        })
+        
+    except Exception as e:
+        db.session.rollback()
+        return jsonify({'success': False, 'message': str(e)}), 500
+
+@api_bp.route('/authors/batch', methods=['POST'])
+def create_authors_batch():
+    """Create multiple authors at once"""
+    try:
+        data = request.get_json()
+        authors_data = data.get('authors', [])
+        
+        if not authors_data:
+            return jsonify({'success': False, 'message': 'No authors provided'}), 400
+        
+        created_authors = []
+        
+        for author_data in authors_data:
+            name = author_data.get('name', '').strip()
+            bio = author_data.get('bio', '').strip()
+            
+            if not name:
+                continue  # Skip empty names
+            
+            # Check if author already exists
+            existing_author = Author.query.filter_by(name=name).first()
+            if existing_author:
+                # Add existing author to results
+                created_authors.append({
+                    'id': existing_author.id,
+                    'name': existing_author.name,
+                    'bio': existing_author.bio
+                })
+                continue
+            
+            # Create new author
+            author = Author(name=name, bio=bio if bio else None)
+            db.session.add(author)
+            db.session.flush()  # Flush to get the ID
+            
+            created_authors.append({
+                'id': author.id,
+                'name': author.name,
+                'bio': author.bio
+            })
+        
+        db.session.commit()
+        
+        return jsonify({
+            'success': True,
+            'authors': created_authors
+        })
+        
+    except Exception as e:
+        db.session.rollback()
+        return jsonify({'success': False, 'message': str(e)}), 500
+
+@api_bp.route('/tags', methods=['POST'])
+def create_tag():
+    """Create a single tag"""
+    try:
+        data = request.get_json()
+        label = data.get('label', '').strip()
+        description = data.get('description', '').strip()
+        
+        if not label:
+            return jsonify({'success': False, 'message': 'Tag label is required'}), 400
+        
+        # Check if tag already exists
+        existing_tag = Tag.query.filter_by(label=label).first()
+        if existing_tag:
+            return jsonify({'success': False, 'message': 'Tag already exists'}), 400
+        
+        # Create new tag
+        tag = Tag(label=label, description=description if description else None)
+        db.session.add(tag)
+        db.session.commit()
+        
+        return jsonify({
+            'success': True,
+            'tag': {
+                'id': tag.id,
+                'label': tag.label,
+                'description': tag.description
+            }
+        })
+        
+    except Exception as e:
+        db.session.rollback()
+        return jsonify({'success': False, 'message': str(e)}), 500
+
+@api_bp.route('/tags/batch', methods=['POST'])
+def create_tags_batch():
+    """Create multiple tags at once"""
+    try:
+        data = request.get_json()
+        tags_data = data.get('tags', [])
+        
+        if not tags_data:
+            return jsonify({'success': False, 'message': 'No tags provided'}), 400
+        
+        created_tags = []
+        
+        for tag_data in tags_data:
+            label = tag_data.get('label', '').strip()
+            description = tag_data.get('description', '').strip()
+            
+            if not label:
+                continue  # Skip empty labels
+            
+            # Check if tag already exists
+            existing_tag = Tag.query.filter_by(label=label).first()
+            if existing_tag:
+                # Add existing tag to results
+                created_tags.append({
+                    'id': existing_tag.id,
+                    'label': existing_tag.label,
+                    'description': existing_tag.description
+                })
+                continue
+            
+            # Create new tag
+            tag = Tag(label=label, description=description if description else None)
+            db.session.add(tag)
+            db.session.flush()  # Flush to get the ID
+            
+            created_tags.append({
+                'id': tag.id,
+                'label': tag.label,
+                'description': tag.description
+            })
+        
+        db.session.commit()
+        
+        return jsonify({
+            'success': True,
+            'tags': created_tags
+        })
+        
+    except Exception as e:
+        db.session.rollback()
+        return jsonify({'success': False, 'message': str(e)}), 500
