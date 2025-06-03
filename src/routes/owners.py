@@ -25,4 +25,8 @@ def owner_add():
 
 @owners_bp.route('/<int:id>/delete', methods=['GET', 'POST'])
 def owner_delete(id):
-    pass
+    owner = Owner.query.get_or_404(id)
+    db.session.delete(owner)
+    db.session.commit()
+    flash('Owner deleted successfully!', 'success')
+    return redirect(url_for('owners.owner_list'))

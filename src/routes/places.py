@@ -1,4 +1,4 @@
-from flask import Blueprint, render_template, redirect, url_for, flash
+from flask import Blueprint, render_template, redirect, url_for, flash, request
 from models import db
 from models.models import Place
 from forms.forms import PlaceForm
@@ -23,7 +23,34 @@ def place_add():
         place = Place(name=form.name.data)
         db.session.add(place)
         db.session.commit()
-        flash('Location added successfully!', 'success')
+        flash('Place added successfully!', 'success')
         return redirect(url_for('places.place_list'))
     
     return render_template('place_form.html', form=form, title='Add Place')
+
+@places_bp.route('/<int:id>/edit', methods=['GET', 'POST'])
+def place_edit(id):
+    place = Place.query.get_or_404(id)
+    form = PlaceForm(obj=place)
+    
+    if request.method == 'GET':
+        form.name.data = place.name
+        form.notes.data = place.notes
+
+    if form.validate_on_submit():
+        place.name = form.name.data
+        place.notes = form.notes.data
+
+        db.session.commit()
+        flash('Place updated successfully!', 'success')
+        return redirect(url_for('places.place_detail', id=place.id))
+    
+    return render_template('place_form.html', form=form, title='Edit Place')
+
+@places_bp.route('/<int:id>/delete', methods=['GET', 'POST'])
+def place_delete(id):
+    place = Place.query.get_or_404(id)
+    db.session.delete(place)
+    db.session.commit()
+    flash('Place deleted successfully!', 'success')
+    return redirect(url_for('places.place_list'))

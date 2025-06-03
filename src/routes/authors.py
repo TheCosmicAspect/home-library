@@ -33,8 +33,13 @@ def author_edit(id):
     author = Author.query.get_or_404(id)
     form = AuthorForm(obj=author)
     
+    if request.method == 'GET':
+        form.name.data = author.name
+        form.bio.data = author.bio
+
     if form.validate_on_submit():
         author.name = form.name.data
+        author.bio = form.bio.data
         db.session.commit()
         flash('Author updated successfully!', 'success')
         return redirect(url_for('authors.author_detail', id=author.id))

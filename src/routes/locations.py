@@ -1,6 +1,6 @@
-from flask import Blueprint, render_template, redirect, url_for, flash
+from flask import Blueprint, render_template, redirect, url_for, flash, request
 from models import db
-from models.models import Location
+from models.models import Location, Place
 from forms.forms import LocationForm
 
 locations_bp = Blueprint('locations', __name__)
@@ -31,8 +31,27 @@ def location_add():
 
 @locations_bp.route('/<int:id>/edit', methods=['GET', 'POST'])
 def location_edit(id):
-    pass
+    location = Location.query.get_or_404(id)
+    form = LocationForm(obj=location)
+    
+    if request.method == 'GET':
+        form.name.data = location.name
+        form.notes.data = location.notes
+
+    if form.validate_on_submit():
+        location.name = form.name.data
+        location.notes = form.notes.data
+
+        db.session.commit()
+        flash('Location updated successfully!', 'success')
+        return redirect(url_for('locations.location_detail', id=location.id))
+    
+    return render_template('location_form.html', form=form, title='Edit Location')
 
 @locations_bp.route('/<int:id>/delete', methods=['GET', 'POST'])
 def location_delete(id):
-    pass
+    location = Location.query.get_or_404(id)
+    db.session.delete(location)
+    db.session.commit()
+    flash('Location deleted successfully!', 'success')
+    return redirect(url_for('locations.location_list'))
