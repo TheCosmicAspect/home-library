@@ -1,0 +1,30 @@
+/* FORMS */
+.ts-wrapper.form-select {
+    min-height: calc(1.5em + 0.75rem + 2px);
+}
+
+.ts-wrapper.multi .ts-control {
+    min-height: calc(1.5em + 0.75rem + 2px);
+}
+
+.missing-item {
+    border: 1px solid #dee2e6;
+    border-radius: 0.375rem;
+    padding: 0.75rem;
+    margin-bottom: 0.75rem;
+    background-color: #f8f9fa;
+}
+
+.missing-item:last-child {
+    margin-bottom: 0;
+}
+
+.missing-item label {
+    font-weight: 500;
+    margin-bottom: 0.25rem;
+}
+
+.missing-item input[type="text"], 
+.missing-item textarea {
+    font-size: 0.875rem;
+}
