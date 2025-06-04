@@ -43,7 +43,7 @@ class Book(db.Model):
     location_id = db.Column(db.Integer, db.ForeignKey('locations.id'))
     owner_id = db.Column(db.Integer, db.ForeignKey('owners.id'))
     cover_url = db.Column(db.Text)
-    created_date = db.Column(db.DateTime(timezone=True), server_default=func.now())
+    created_date = db.Column(db.DateTime(timezone=True), default=func.now())
     
     # Relationships
     authors = db.relationship('Author', secondary=books_authors, backref=db.backref('books', lazy='dynamic'))

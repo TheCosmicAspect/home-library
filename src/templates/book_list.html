@@ -28,7 +28,7 @@
                 <td>{{ book.isbn }}</td>
                 <td>
                     {% for author in book.authors %}
-                    <a href="{{ url_for('authors.author_detail', id=author.id) }}" class="badge bg-primary text-decoration-none">{{ author.name }}</a>
+                    <a href="{{ url_for('authors.author_detail', id=author.id) }}" class="badge bg-primary text-decoration-none">{{ author.name|truncate(20) }}</a>
                     {% endfor %}
                 </td>
                 <td>
