@@ -8,7 +8,7 @@ As this is still under development, detailed installation instructions are not g
 - Install postgresql on the host
 - Set up a database with the schema provided by [db.sql](db.sql)
 - Download the files in [src/](src/) to the desired directory
-- Install the required libraries with `pip install flask flask-sqlalchemy dotenv psycop2 config flask-wtf requests`
+- Install the required libraries with `pip install flask flask-sqlalchemy dotenv psycopg2 config flask-wtf requests`
 - Create a `.env` file with the following information:
 ```
 FLASK_APP=app.py
