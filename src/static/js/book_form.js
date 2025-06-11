@@ -18,6 +18,12 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     });
 
+    // Initialize modal instances and store references
+    const addAuthorModal = new bootstrap.Modal(document.getElementById('addAuthorModal'));
+    const addTagModal = new bootstrap.Modal(document.getElementById('addTagModal'));
+    const missingAuthorsModal = new bootstrap.Modal(document.getElementById('missingAuthorsModal'));
+    const missingTagsModal = new bootstrap.Modal(document.getElementById('missingTagsModal'));
+
     // ISBN lookup functionality
     const isbnField = document.getElementById('isbn');
     const titleField = document.getElementById('title');
@@ -152,7 +158,6 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 
     function showMissingAuthorsModal(missingAuthors) {
-        const modal = new bootstrap.Modal(document.getElementById('missingAuthorsModal'));
         const listContainer = document.getElementById('missingAuthorsList');
         
         listContainer.innerHTML = '';
@@ -181,11 +186,10 @@ document.addEventListener('DOMContentLoaded', function() {
             listContainer.appendChild(itemDiv);
         });
         
-        modal.show();
+        missingAuthorsModal.show();
     }
 
     function showMissingTagsModal(missingTags) {
-        const modal = new bootstrap.Modal(document.getElementById('missingTagsModal'));
         const listContainer = document.getElementById('missingTagsList');
         
         listContainer.innerHTML = '';
@@ -214,7 +218,27 @@ document.addEventListener('DOMContentLoaded', function() {
             listContainer.appendChild(itemDiv);
         });
         
-        modal.show();
+        missingTagsModal.show();
+    }
+
+    // Helper function to hide modals and clean up backdrops
+    function hideModal(modal) {
+        modal.hide();
+        
+        // Clean up any lingering backdrops after a short delay
+        setTimeout(() => {
+            const backdrops = document.querySelectorAll('.modal-backdrop');
+            backdrops.forEach(backdrop => {
+                if (backdrop.parentNode) {
+                    backdrop.parentNode.removeChild(backdrop);
+                }
+            });
+            
+            // Ensure body classes are cleaned up
+            document.body.classList.remove('modal-open');
+            document.body.style.paddingRight = '';
+            document.body.style.overflow = '';
+        }, 300); // Wait for Bootstrap animation to complete
     }
 
     // Add Author functionality
@@ -246,7 +270,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 
                 // Clear form and close modal
                 document.getElementById('addAuthorForm').reset();
-                bootstrap.Modal.getInstance(document.getElementById('addAuthorModal')).hide();
+                hideModal(addAuthorModal);
                 
                 showMessage(`Author "${name}" added successfully!`, 'success');
             } else {
@@ -287,7 +311,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 
                 // Clear form and close modal
                 document.getElementById('addTagForm').reset();
-                bootstrap.Modal.getInstance(document.getElementById('addTagModal')).hide();
+                hideModal(addTagModal);
                 
                 showMessage(`Tag "${label}" added successfully!`, 'success');
             } else {
@@ -316,7 +340,7 @@ document.addEventListener('DOMContentLoaded', function() {
         });
         
         if (authorsToCreate.length === 0) {
-            bootstrap.Modal.getInstance(modal).hide();
+            hideModal(missingAuthorsModal);
             return;
         }
         
@@ -343,7 +367,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 // Select all newly created authors
                 authorsSelect.setValue([...authorsSelect.getValue(), ...newAuthorIds]);
                 
-                bootstrap.Modal.getInstance(modal).hide();
+                hideModal(missingAuthorsModal);
                 showMessage(`${data.authors.length} author(s) created successfully!`, 'success');
             } else {
                 alert('Error creating authors: ' + (data.message || 'Unknown error'));
@@ -371,7 +395,7 @@ document.addEventListener('DOMContentLoaded', function() {
         });
         
         if (tagsToCreate.length === 0) {
-            bootstrap.Modal.getInstance(modal).hide();
+            hideModal(missingTagsModal);
             return;
         }
         
@@ -398,7 +422,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 // Select all newly created tags
                 tagsSelect.setValue([...tagsSelect.getValue(), ...newTagIds]);
                 
-                bootstrap.Modal.getInstance(modal).hide();
+                hideModal(missingTagsModal);
                 showMessage(`${data.tags.length} tag(s) created successfully!`, 'success');
             } else {
                 alert('Error creating tags: ' + (data.message || 'Unknown error'));
@@ -407,6 +431,24 @@ document.addEventListener('DOMContentLoaded', function() {
             console.error('Error creating tags:', error);
             alert('Error creating tags. Please try again.');
         }
+    });
+
+    // Add event listeners to handle modal backdrop cleanup on all modal close events
+    [addAuthorModal, addTagModal, missingAuthorsModal, missingTagsModal].forEach(modal => {
+        modal._element.addEventListener('hidden.bs.modal', function() {
+            // Clean up any lingering backdrops
+            const backdrops = document.querySelectorAll('.modal-backdrop');
+            backdrops.forEach(backdrop => {
+                if (backdrop.parentNode) {
+                    backdrop.parentNode.removeChild(backdrop);
+                }
+            });
+            
+            // Ensure body classes are cleaned up
+            document.body.classList.remove('modal-open');
+            document.body.style.paddingRight = '';
+            document.body.style.overflow = '';
+        });
     });
 
     function showLoadingState(isLoading) {
