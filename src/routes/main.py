@@ -5,7 +5,7 @@ main_bp = Blueprint('main', __name__)
 
 @main_bp.route('/')
 def index():
-    books = Book.query.order_by(Book.created_date).limit(8).all()
+    books = Book.query.order_by(Book.created_date.desc()).limit(8)
     for book in books:
         print(f"{book.title}: {book.created_date}")
     return render_template('index.html', books=books)
