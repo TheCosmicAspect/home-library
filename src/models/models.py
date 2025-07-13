@@ -1,85 +1,129 @@
 from . import db
 from sqlalchemy.sql import func
+from sqlalchemy import Column, Integer, Text, String, BigInteger, DateTime, ForeignKey, Table
+from sqlalchemy.ext.declarative import declarative_base
+from sqlalchemy.orm import relationship
+from sqlalchemy.sql import func
 
-# Association tables
-books_authors = db.Table('books_authors',
-    db.Column('books_id', db.Integer, db.ForeignKey('books.id', ondelete='CASCADE'), primary_key=True),
-    db.Column('authors_id', db.Integer, db.ForeignKey('authors.id', ondelete='CASCADE'), primary_key=True)
+Base = declarative_base()
+
+# Association tables for many-to-many relationships
+works_authors = Table(
+    'works_authors',
+    Base.metadata,
+    Column('works_id', Integer, ForeignKey('works.id'), primary_key=True),
+    Column('authors_id', Integer, ForeignKey('authors.id'), primary_key=True)
 )
 
-books_tags = db.Table('books_tags',
-    db.Column('books_id', db.Integer, db.ForeignKey('books.id', ondelete='CASCADE'), primary_key=True),
-    db.Column('tags_id', db.Integer, db.ForeignKey('tags.id', ondelete='CASCADE'), primary_key=True)
+works_tags = Table(
+    'works_tags',
+    Base.metadata,
+    Column('works_id', Integer, ForeignKey('works.id'), primary_key=True),
+    Column('tags_id', Integer, ForeignKey('tags.id'), primary_key=True)
 )
 
-# Tables
-class Author(db.Model):
+class Author(Base):
     __tablename__ = 'authors'
     
-    id = db.Column(db.Integer, primary_key=True)
-    name = db.Column(db.Text, nullable=False)
-    bio = db.Column(db.Text)
-    
-    def __repr__(self):
-        return f'<Author {self.name}>'
-
-class Tag(db.Model):
-    __tablename__ = 'tags'
-    
-    id = db.Column(db.Integer, primary_key=True)
-    label = db.Column(db.Text)
-    description = db.Column(db.Text)
-    
-    def __repr__(self):
-        return f'<Tag {self.label}>'
-
-class Book(db.Model):
-    __tablename__ = 'books'
-    
-    id = db.Column(db.Integer, primary_key=True)
-    title = db.Column(db.Text, nullable=False)
-    isbn = db.Column(db.String(20))
-    description = db.Column(db.Text)
-    location_id = db.Column(db.Integer, db.ForeignKey('locations.id'))
-    owner_id = db.Column(db.Integer, db.ForeignKey('owners.id'))
-    cover_url = db.Column(db.Text)
-    created_date = db.Column(db.DateTime(timezone=True), default=func.now())
+    id = Column(Integer, primary_key=True, autoincrement=True)
+    primary_name = Column(Text, nullable=False)
+    bio = Column(Text)
     
     # Relationships
-    authors = db.relationship('Author', secondary=books_authors, backref=db.backref('books', lazy='dynamic'))
-    tags = db.relationship('Tag', secondary=books_tags, backref=db.backref('books', lazy='dynamic'))
-    location = db.relationship('Location', backref=db.backref('books', lazy='dynamic'))
-    owner = db.relationship('Owner', backref=db.backref('books', lazy='dynamic'))
+    alt_names = relationship("AuthorName", back_populates="author")
+    works = relationship("Work", secondary=works_authors, back_populates="authors")
 
-    def __repr__(self):
-        return f'<Book {self.title}>'
+class AuthorName(Base):
+    __tablename__ = 'author_names'
+    
+    id = Column(Integer, primary_key=True, autoincrement=True)
+    author_id = Column(Integer, ForeignKey('authors.id'), nullable=False)
+    alt_name = Column(Text)
+    
+    # Relationships
+    author = relationship("Author", back_populates="alt_names")
 
-class Location(db.Model):
+class Work(Base):
+    __tablename__ = 'works'
+    
+    id = Column(Integer, primary_key=True, autoincrement=True)
+    title = Column(Text, nullable=False)
+    publisher = Column(Text)
+    isbn = Column(BigInteger, unique=True)
+    description = Column(Text)
+    cover_url = Column(Text)
+    
+    # Relationships
+    authors = relationship("Author", secondary=works_authors, back_populates="works")
+    tags = relationship("Tag", secondary=works_tags, back_populates="works")
+    copies = relationship("Copy", back_populates="work")
+
+class User(Base):
+    __tablename__ = 'users'
+    
+    id = Column(Integer, primary_key=True, autoincrement=True)
+    name = Column(Text, unique=True, nullable=False)
+    info = Column(Text)
+    join_date = Column(DateTime, nullable=False)
+    
+    # Relationships
+    owned_copies = relationship("Copy", foreign_keys="Copy.owner_id", back_populates="owner")
+    borrowed_copies = relationship("Copy", foreign_keys="Copy.lended_to", back_populates="borrower")
+
+class Tag(Base):
+    __tablename__ = 'tags'
+    
+    id = Column(Integer, primary_key=True, autoincrement=True)
+    parent_id = Column(Integer, ForeignKey('tags.id'))
+    type = Column(String(50), nullable=False)
+    label = Column(Text, nullable=False)
+    description = Column(Text)
+    
+    # Relationships
+    parent = relationship("Tag", remote_side=[id], back_populates="children")
+    children = relationship("Tag", back_populates="parent")
+    works = relationship("Work", secondary=works_tags, back_populates="tags")
+
+class Location(Base):
     __tablename__ = 'locations'
+    
+    id = Column(Integer, primary_key=True, autoincrement=True)
+    parent_id = Column(Integer, ForeignKey('locations.id'))
+    name = Column(Text, nullable=False)
+    description = Column(Text)
+    type = Column(String(50), nullable=False)
+    
+    # Relationships
+    parent = relationship("Location", remote_side=[id], back_populates="children")
+    children = relationship("Location", back_populates="parent")
+    copies = relationship("Copy", back_populates="location")
 
-    id = db.Column(db.Integer, primary_key=True)
-    name = db.Column(db.Text)
-    notes = db.Column(db.Text)
-    place_id = db.Column(db.Integer)
+class Copy(Base):
+    __tablename__ = 'copies'
+    
+    id = Column(Integer, primary_key=True, autoincrement=True)
+    work_id = Column(Integer, ForeignKey('works.id'), nullable=False)
+    location_id = Column(Integer, ForeignKey('locations.id'), nullable=False)
+    owner_id = Column(Integer, ForeignKey('users.id'))
+    condition = Column(String(50))
+    acquired = Column(DateTime(timezone=True), default=func.now)
+    lended_to = Column(Integer, ForeignKey('users.id'))
+    
+    # Relationships
+    work = relationship("Work", back_populates="copies")
+    location = relationship("Location", back_populates="copies")
+    owner = relationship("User", foreign_keys=[owner_id], back_populates="owned_copies")
+    borrower = relationship("User", foreign_keys=[lended_to], back_populates="borrowed_copies")
 
-    def __repr__(self):
-        return f'<Location {self.name}>'
 
-class Place(db.Model):
-    __tablename__ = 'places'
+# Helper functions
+def create_tables(engine):
+    """Create all tables in the database"""
+    Base.metadata.create_all(engine)
 
-    id = db.Column(db.Integer, primary_key=True)
-    name = db.Column(db.Text)
-    notes = db.Column(db.Text)
-
-    def __repr__(self):
-        return f'<Place {self.name}>'
-
-class Owner(db.Model):
-    __tablename__ = 'owners'
-
-    id = db.Column(db.Integer, primary_key=True)
-    name = db.Column(db.Text)
-
-    def __repr__(self):
-        return f'<Owner {self.name}>'
+def get_works_by_author(session, author_name):
+    """Get all works by an author (searching primary name and alt names)"""
+    return session.query(Work).join(works_authors).join(Author).outerjoin(AuthorName).filter(
+        (Author.primary_name.ilike(f'%{author_name}%')) | 
+        (AuthorName.alt_name.ilike(f'%{author_name}%'))
+    ).all()

@@ -7,7 +7,7 @@
     <hr class="my-4">
     <p>You can add, edit, and organize your books, authors, and tags.</p>
     <div class="mt-4">
-        <a href="{{ url_for('books.book_list') }}" class="btn btn-primary btn-lg">View Books</a>
+        <a href="{{ url_for('books.books') }}" class="btn btn-primary btn-lg">View Books</a>
         <a href="{{ url_for('books.book_add') }}" class="btn btn-success btn-lg">Add New Book</a>
     </div>
 </div>
@@ -18,7 +18,7 @@
             <div class="card-body">
                 <h5 class="card-title">Books</h5>
                 <p class="card-text">Manage your book collection.</p>
-                <a href="{{ url_for('books.book_list') }}" class="btn btn-primary">View Books</a>
+                <a href="{{ url_for('books.work_list') }}" class="btn btn-primary">View Books</a>
             </div>
         </div>
     </div>
@@ -43,7 +43,7 @@
     <div class="col-md-3">
         <div class="card">
             <div class="card-body">
-                <h5 class="card-title">Places</h5>
+                <h5 class="card-title">Locations</h5>
                 <p class="card-text">Manage your book locations.</p>
                 <a href="{{ url_for('locations.location_list') }}" class="btn btn-primary">View Locations</a>
             </div>
@@ -55,7 +55,7 @@
     <h2 class="display-4">Recent additions</h2>
     {% for book in books %}
     <div class="col-md-3">
-        <a href="{{ url_for('books.book_detail', id=book.id) }}" class="card text-decoration-none text-body">
+        <a href="{{ url_for('books.work_detail', id=book.id) }}" class="card text-decoration-none text-body">
             <img src="{{ book.cover_url }}" class="card-img-top">
             <div class="card-body">
                 <h4 class="card-title">{{ book.title }}</h5>

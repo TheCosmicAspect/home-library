@@ -1,6 +1,6 @@
 from flask import Blueprint, request, jsonify
 from models import db
-from models.models import Book, Author, Tag, Location
+from models.models import Work, Copy, Author, Tag, Location
 from sqlalchemy import or_, cast, String
 import requests
 

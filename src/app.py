@@ -30,18 +30,16 @@ from routes.books import books_bp
 from routes.authors import authors_bp
 from routes.tags import tags_bp
 from routes.locations import locations_bp
-from routes.places import places_bp
-from routes.owners import owners_bp
-from routes.api import api_bp
+from routes.users import users_bp
+# from routes.api import api_bp
 
 app.register_blueprint(main_bp)
 app.register_blueprint(books_bp, url_prefix='/books')
 app.register_blueprint(authors_bp, url_prefix='/authors')
 app.register_blueprint(tags_bp, url_prefix='/tags')
 app.register_blueprint(locations_bp, url_prefix='/locations')
-app.register_blueprint(places_bp, url_prefix='/places')
-app.register_blueprint(owners_bp, url_prefix='/owners')
-app.register_blueprint(api_bp, url_prefix='/api')
+app.register_blueprint(users_bp, url_prefix='/users')
+# app.register_blueprint(api_bp, url_prefix='/api')
 
 
 if __name__ == '__main__':

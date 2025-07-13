@@ -1,13 +1,15 @@
 from flask import Blueprint, render_template
-from models.models import Book
+from models.models import Copy
+from models import db
 
 main_bp = Blueprint('main', __name__)
 
+# Index page
 @main_bp.route('/')
 def index():
-    books = Book.query.order_by(Book.created_date.desc()).limit(8)
+    books = db.session.query(Copy).order_by(Copy.acquired.desc()).limit(10).all()
     for book in books:
-        print(f"{book.title}: {book.created_date}")
+        print(f"{book.title}: {book.acquired}")
     return render_template('index.html', books=books)
 
 @main_bp.route('/search')

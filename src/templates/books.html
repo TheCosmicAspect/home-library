@@ -1,0 +1,95 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h1>Books</h1>
+    <a href="{{ url_for('books.book_add') }}" class="btn btn-success">Add New Book</a>
+</div>
+
+<!-- Search -->
+<form action="{{ url_for('main.search_page') }}" method="GET" class="mb-4">
+    <div class="input-group">
+        <input type="text" name="q" class="form-control" placeholder="Search books..." aria-label="Search">
+        <button class="btn btn-light" type="submit">
+            <i class="fas fa-search"></i>
+        </button>
+    </div>
+</form>
+
+<div class="row mb-4">
+    <!-- Works card -->
+    <div class="col-md-6">
+        <a href="{{ url_for('books.work_list') }}" class="text-decoration-none">
+            <div class="card h-100">
+                <div class="row g-0 m-2">
+                    <div class="col-9 p-3">
+                        <h4 class="card-title">View works</h4>
+                        <h5 class="card-subtitle mb-2">{{ works|length }} works</h5>
+                        <h6 class="card-text">Recently added: [work title]</h6>
+                    </div>
+                    <div class="col-3 text-center">
+                        <img src="{{ url_for('static', filename='img/book_placeholder.jpeg') }}" alt="Works" class="img-fluid rounded m-2" style="max-width: 80%;">
+                    </div>
+                </div>
+            </div>
+        </a>
+    </div>
+
+    <!-- Copies card -->
+    <div class="col-md-6">
+        <a href="{{ url_for('books.work_list') }}" class="text-decoration-none">
+            <div class="card h-100">
+                <div class="row g-0 m-2">
+                    <div class="col-9 p-3">
+                        <h4 class="card-title">View copies</h4>
+                        <h5 class="card-subtitle mb-2">{{ copies|length }} copies</h5>
+                        <h6 class="card-text">Recently added: [copy title]</h6>
+                    </div>
+                    <div class="col-3 text-center">
+                        <img src="{{ url_for('static', filename='img/book_placeholder.jpeg') }}" alt="Works" class="img-fluid rounded m-2" style="max-width: 80%;">
+                    </div>
+                </div>
+            </div>
+        </a>
+    </div>
+</div>
+
+{% if works %}
+<div class="table-responsive">
+    <table class="table table-striped">
+        <thead>
+            <tr>
+                <th>Title</th>
+                <th>ISBN</th>
+                <th>Copies</th>
+                <th>Author(s)</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for work in works %}
+            <tr>
+                <td><a href="{{ url_for('books.work_detail', id=work.id) }}">{{ work.title }}</a></td>
+                <td>{{ work.isbn }}</td>
+                <td><a href="{{ url_for('books.work_copies', id=work.id) }}">{{ work.copies|length }} copies</a></td>
+                <td>
+                    {% for author in work.authors %}
+                    <a href="{{ url_for('authors.author_detail', id=author.id) }}" class="badge bg-primary text-decoration-none">{{ author.name|truncate(20) }}</a>
+                    {% endfor %}
+                </td>
+                <td>
+                    <a href="{{ url_for('books.work_detail', id=work.id) }}" class="btn btn-sm btn-primary">View</a>
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% else %}
+<div class="alert alert-info">
+    No works found. <a href="{{ url_for('books.book_add') }}">Add your first book</a>.
+</div>
+{% endif %}
+
+{% endblock %}
