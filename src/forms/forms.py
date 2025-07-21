@@ -1,5 +1,5 @@
 from flask_wtf import FlaskForm
-from wtforms import StringField, TextAreaField, SelectMultipleField, SubmitField, SelectField
+from wtforms import FieldList, StringField, TextAreaField, SelectMultipleField, SubmitField, SelectField
 from wtforms.validators import DataRequired, Length
 
 class BookForm(FlaskForm):
@@ -28,11 +28,7 @@ class CopyForm(FlaskForm):
 class AuthorForm(FlaskForm):
     name = StringField('Name', validators=[DataRequired()])
     bio = TextAreaField('Bio')
-    submit = SubmitField('Submit')
-
-class AuthorNameForm(FlaskForm):
-    author = SelectField('Author', coerce=int, validators=[DataRequired()])
-    name = StringField('Name', validators=[DataRequired()])
+    alt_names = FieldList(StringField('Alternative Name'), 'Alternative Names', min_entries=0)
     submit = SubmitField('Submit')
 
 class TagForm(FlaskForm):
