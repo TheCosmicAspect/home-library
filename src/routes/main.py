@@ -8,8 +8,6 @@ main_bp = Blueprint('main', __name__)
 @main_bp.route('/')
 def index():
     books = db.session.query(Copy).order_by(Copy.acquired.desc()).limit(10).all()
-    for book in books:
-        print(f"{book.title}: {book.acquired}")
     return render_template('index.html', books=books)
 
 @main_bp.route('/search')
