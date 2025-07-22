@@ -13,19 +13,19 @@
 
 <h3 class="mt-4">Books at this location</h3>
 
-{% if location.books.count() > 0 %}
+{% if location.copies|length > 0 %}
 <div class="list-group mt-3">
-    {% for book in location.books %}
-    <a href="{{ url_for('books.book_detail', id=book.id) }}" class="list-group-item list-group-item-action">
+    {% for copy in location.copies %}
+    <a href="{{ url_for('books.copy_detail', id=copy.id) }}" class="list-group-item list-group-item-action">
         <div class="d-flex w-100 justify-content-between">
-            <h5 class="mb-1">{{ book.title }}</h5>
-            <small>ISBN: {{ book.isbn }}</small>
+            <h5 class="mb-1">{{ copy.work.title }}</h5>
+            <small>ISBN: {{ copy.work.isbn }}</small>
         </div>
-        {% if book.description %}
-        <p class="mb-1">{{ book.description|truncate(100) }}</p>
+        {% if copy.work.description %}
+        <p class="mb-1">{{ copy.work.description|truncate(100) }}</p>
         {% endif %}
         <small>
-            {% for tag in book.tags %}
+            {% for tag in copy.work.tags %}
             <span class="badge bg-secondary">{{ tag.label }}</span>
             {% endfor %}
         </small>
@@ -51,7 +51,7 @@
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <div class="modal-body">
-                Are you sure you want to delete "{{ location.name }}"? This will remove information from {{ location.books.count() }} books.
+                Are you sure you want to delete "{{ location.name }}"? This will remove information from {{ location.copies|length }} books.
             </div>
             <div class="modal-footer">
                 <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>

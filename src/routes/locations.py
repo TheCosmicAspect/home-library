@@ -1,4 +1,4 @@
-from flask import Blueprint, render_template, redirect, url_for, flash
+from flask import Blueprint, render_template, redirect, url_for, flash, request
 from models import db
 from models.models import Location
 from forms.forms import LocationForm
@@ -8,22 +8,24 @@ locations_bp = Blueprint('locations', __name__)
 # Locations main route - shows all locations
 @locations_bp.route('/')
 def location_list():
-    locations = Location.query.all()
+    locations = db.session.query(Location).all()
     return render_template('location_list.html', locations=locations)
 
 # Location detail
 @locations_bp.route('/<int:id>')
 def location_detail(id):
-    location = Location.query.get_or_404(id)
+    location = db.session.query(Location).get(id)
     return render_template('location_detail.html', location=location)
 
-# Add a new location
+# Add Location
 @locations_bp.route('/add', methods=['GET', 'POST'])
 def location_add():
     form = LocationForm()
-    form.parent.choices = [(l.id, l.name) for l in Location.query.all()]
+    form.parent.choices = [(0, '-none-')] + [(loc.id, loc.name) for loc in db.session.query(Location).all()]
 
     if form.validate_on_submit():
+        if form.parent.data == 0:
+            form.parent.data = None
         location = Location(
             name=form.name.data,
             description=form.description.data,
@@ -40,11 +42,19 @@ def location_add():
 # Edit location
 @locations_bp.route('/<int:id>/edit', methods=['GET', 'POST'])
 def location_edit(id):
-    location = Location.query.get_or_404(id)
+    location = db.session.query(Location).get(id)
     form = LocationForm(obj=location)
-    form.parent.choices = [(l.id, l.name) for l in Location.query.all()]
+    form.parent.choices = [(0, '-none-')] + [(loc.id, loc.name) for loc in db.session.query(Location).filter(Location.id != id).all()]
+
+    if request.method == 'GET':
+        form.name.data = location.name
+        form.description.data = location.description
+        form.parent.data = location.parent.id if location.parent else 0
+        form.type.data = location.type
 
     if form.validate_on_submit():
+        if form.parent.data == 0:
+            form.parent.data = None
         location.name = form.name.data
         location.description = form.description.data
         location.parent_id = form.parent.data
@@ -59,7 +69,7 @@ def location_edit(id):
 # Delete location
 @locations_bp.route('/<int:id>/delete', methods=['GET', 'POST'])
 def location_delete(id):
-    location = Location.query.get_or_404(id)
+    location = db.session.query(Location).get(id)
     db.session.delete(location)
     db.session.commit()
     flash('Location deleted successfully!', 'success')

@@ -7,9 +7,6 @@
     <h1>Locations</h1>
     <a href="{{ url_for('locations.location_add') }}" class="btn btn-success">Add New Location</a>
 </div>
-<div class="alert alert-info">
-    Looking for places? <a href="{{ url_for('places.place_list') }}">Go to places</a>.
-</div>
 
 {% if locations %}
 <div class="table-responsive">
@@ -25,7 +22,7 @@
             {% for location in locations %}
             <tr>
                 <td><a href="{{ url_for('locations.location_detail', id=location.id) }}">{{ location.name }}</a></td>
-                <td>{{ location.books.count() }}</td>
+                <td>{{ location.copies|length }}</td>
                 <td>
                     <a href="{{ url_for('locations.location_detail', id=location.id) }}" class="btn btn-sm btn-info">View</a>
                 </td>

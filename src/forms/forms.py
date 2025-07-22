@@ -41,7 +41,7 @@ class TagForm(FlaskForm):
 class LocationForm(FlaskForm):
     name = StringField('Name', validators=[DataRequired()])
     description = TextAreaField('Description')
-    parent = SelectField('Parent', coerce=int, validators=[DataRequired()])
+    parent = SelectField('Parent', coerce=int, validators=[Optional()])
     type = StringField('Type', validators=[Length(max=50)])
     submit = SubmitField('Submit')
 
