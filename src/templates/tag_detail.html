@@ -13,19 +13,19 @@
 
 <h3 class="mt-4">Books with this tag</h3>
 
-{% if tag.books.count() > 0 %}
+{% if tag.works|length > 0 %}
 <div class="list-group mt-3">
-    {% for book in tag.books %}
-    <a href="{{ url_for('books.book_detail', id=book.id) }}" class="list-group-item list-group-item-action">
+    {% for work in tag.works %}
+    <a href="{{ url_for('books.work_detail', id=work.id) }}" class="list-group-item list-group-item-action">
         <div class="d-flex w-100 justify-content-between">
-            <h5 class="mb-1">{{ book.title }}</h5>
-            <small>ISBN: {{ book.isbn }}</small>
+            <h5 class="mb-1">{{ work.title }}</h5>
+            <small>ISBN: {{ work.isbn }}</small>
         </div>
-        {% if book.description %}
-        <p class="mb-1">{{ book.description|truncate(100) }}</p>
+        {% if work.description %}
+        <p class="mb-1">{{ work.description|truncate(100) }}</p>
         {% endif %}
         <small>
-            {% for author in book.authors %}
+            {% for author in work.authors %}
             <span class="badge bg-primary">{{ author.name }}</span>
             {% endfor %}
         </small>
@@ -34,7 +34,7 @@
 </div>
 {% else %}
 <div class="alert alert-info mt-3">
-    No books found with this tag.
+    No works found with this tag.
 </div>
 {% endif %}
 
@@ -51,7 +51,7 @@
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <div class="modal-body">
-                Are you sure you want to delete "{{ tag.label }}"? This will remove information from {{ tag.books.count() }} books.
+                Are you sure you want to delete "{{ tag.label }}"? This will remove information from {{ tag.works|length }} works.
             </div>
             <div class="modal-footer">
                 <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>

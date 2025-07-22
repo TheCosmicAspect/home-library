@@ -22,7 +22,7 @@
             {% for tag in tags %}
             <tr>
                 <td><a href="{{ url_for('tags.tag_detail', id=tag.id) }}">{{ tag.label }}</a></td>
-                <td>{{ tag.books.count() }}</td>
+                <td>{{ tag.works|length }}</td>
                 <td>
                     <a href="{{ url_for('tags.tag_detail', id=tag.id) }}" class="btn btn-sm btn-info">View</a>
                 </td>
