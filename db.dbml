@@ -1,0 +1,69 @@
+// View DB diagram at https://dbdiagram.io or other dbml viewer
+
+Table authors {
+  id integer [pk, unique, not null, increment]
+  primary_name text [not null]
+  bio text
+}
+
+// To handle alternative author names
+Table author_names {
+  id integer [pk, unique, not null, increment]
+  author_id integer [not null]
+  alt_name text
+}
+
+// Books (ISBN specific)
+Table works {
+  id integer [pk, unique, not null, increment]
+  title text [not null]
+  publisher text
+  isbn bigint unique
+  description text
+  cover_url text
+}
+
+// Book instances
+Table copies {
+  id integer [pk, unique, not null, increment]
+  work_id integer [not null]
+  location_id integer [not null]
+  owner_id integer
+  condition varchar(50)
+  acquired timestamp [not null]
+  lended_to integer
+}
+
+Table users {
+  id integer [pk, unique, not null, increment]
+  name text [unique, not null]
+  info text
+  join_date timestamp [not null]
+}
+
+Table tags {
+  id integer [pk, unique, not null, increment]
+  parent_id integer
+  type varchar(50) [not null] // "Genre", "category", "topic", etc
+  label text [not null]
+  description text
+}
+
+Table locations {
+  id integer [pk, unique, not null, increment]
+  parent_id integer
+  name text [not null]
+  description text
+  type varchar(50) [not null] // "Building", "Room", "Shelf", "Section", etc
+}
+
+
+Ref works_authors: works.id <> authors.id
+Ref works_tags: works.id <> tags.id
+Ref: copies.location_id > locations.id
+Ref: locations.parent_id > locations.id
+Ref: copies.work_id > works.id
+Ref: copies.owner_id > users.id
+Ref: author_names.author_id > authors.id
+Ref: tags.parent_id > tags.id
+Ref: copies.lended_to > users.id

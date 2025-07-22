@@ -8,21 +8,31 @@
     <a href="{{ url_for('authors.author_add') }}" class="btn btn-success">Add New Author</a>
 </div>
 
+<!-- Search -->
+<form action="{{ url_for('main.search_page') }}" method="GET" class="mb-4">
+    <div class="input-group">
+        <input type="text" name="q" class="form-control" placeholder="Search authors..." aria-label="Search">
+        <button class="btn btn-light" type="submit">
+            <i class="fas fa-search"></i>
+        </button>
+    </div>
+</form>
+
 {% if authors %}
 <div class="table-responsive">
     <table class="table table-striped">
         <thead>
             <tr>
                 <th>Name</th>
-                <th>Books</th>
+                <th>Works</th>
                 <th>Actions</th>
             </tr>
         </thead>
         <tbody>
             {% for author in authors %}
             <tr>
-                <td><a href="{{ url_for('authors.author_detail', id=author.id) }}">{{ author.name }}</a></td>
-                <td>{{ author.books.count() }}</td>
+                <td><a href="{{ url_for('authors.author_detail', id=author.id) }}">{{ author.primary_name }}</a></td>
+                <td>{{ author.works|length }}</td>
                 <td>
                     <a href="{{ url_for('authors.author_detail', id=author.id) }}" class="btn btn-sm btn-info">View</a>
                 </td>

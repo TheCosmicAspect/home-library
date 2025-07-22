@@ -1,0 +1,30 @@
+{% extends "base.html" %}
+
+{% block title %}{{ title }} - {{ super() }}{% endblock %}
+
+{% block content %}
+<h1>{{ title }}</h1>
+
+<form method="POST" class="mt-4">
+    {{ form.hidden_tag() }}
+    
+    <div class="row mb-4">
+        <div class="col-md-9 mb-3">
+            <div class="d-flex align-items-center h-100">
+                {{ form.isbn(class="form-control", placeholder="ISBN") }}
+            </div>
+            {% if form.isbn.errors %}
+                {% for error in form.isbn.errors %}
+                    <div class="text-danger">{{ error }}</div>
+                {% endfor %}
+            {% endif %}
+        </div>
+            
+        <div class="col-md-3 mb-3 row">
+            {{ form.submit(class="btn btn-primary col-4 m-3") }}
+            <a href="{{ url_for('books.books') }}" class="btn btn-secondary col-4 m-3">Cancel</a>
+        </div>
+    </div>
+</form>
+
+{% endblock %}

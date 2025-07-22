@@ -14,13 +14,18 @@
     </div>
 
     <div class="mb-3">
-        {{ form.notes.label(class="form-label") }}
-        {{ form.notes(class="form-control", rows=5) }}
+        {{ form.description.label(class="form-label") }}
+        {{ form.description(class="form-control", rows=5) }}
     </div>
 
     <div class="mb-3">
-        {{ form.place.label(class="form-label") }}
-        {{ form.place(class="form-select", multiple=false, size=5) }}
+        {{ form.parent.label(class="form-label") }}
+        {{ form.parent(class="form-control") }}
+    </div>
+
+    <div class="mb-3">
+        {{ form.type.label(class="form-label") }}
+        {{ form.type(class="form-control") }}
     </div>
     
     <div class="mb-3">

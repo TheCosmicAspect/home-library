@@ -7,20 +7,65 @@
 
 <form method="POST" class="mt-4">
     {{ form.hidden_tag() }}
-        
+    
+    <!-- Name -->
     <div class="mb-3">
         {{ form.name.label(class="form-label") }}
         {{ form.name(class="form-control", rows=1) }}
     </div>
 
+    <!-- Bio -->
     <div class="mb-3">
         {{ form.bio.label(class="form-label") }}
         {{ form.bio(class="form-control", rows=5) }}
     </div>
     
+    <!-- Alt names -->
+    <div class="mb-3">
+        {{ form.alt_names.label(class="form-label") }}
+        <div class="alt-name-container" id="alt-name-container">
+            {% for alt_name_form in form.alt_names %}
+                <div class="alt-name-field" data-index="{{ loop.index0 }}">
+                    {{ alt_name_form(class="form-control", placeholder="Alternative Name") }}
+                    <button type="button" class="btn btn-danger delete-name" onclick="removeName(this)">Delete</button>
+                </div>
+            {% endfor %}
+
+            {% if form.alt_names|length == 0 %}
+                <div class="no-alt-names" id="no-alt-names-message">No alternative names added yet. Click "Add Name" to add one.</div>
+            {% endif %}
+        </div>
+        
+        <button type="button" class="btn btn-secondary" onclick="addName()">Add Name</button>
+    </div>
+
+    <!-- Submit -->
     <div class="mb-3">
         {{ form.submit(class="btn btn-primary") }}
-        <a href="{{ url_for('books.book_list') }}" class="btn btn-secondary">Cancel</a>
+        <a href="{{ url_for('authors.author_list') }}" class="btn btn-secondary">Cancel</a>
     </div>
 </form>
+
+<script>
+
+function addName() {
+    const container = document.getElementById('alt-name-container');
+    const index = container.children.length;
+    const newField = document.createElement('div');
+    newField.className = 'alt-name-field';
+    newField.setAttribute('data-index', index);
+    newField.innerHTML = `
+        <input type="text" name="alt_names-${index}" class="form-control" placeholder="Alternative Name">
+        <button type="button" class="btn btn-danger delete-name" onclick="removeName(this)">Delete</button>
+    `;
+    container.appendChild(newField);
+}
+
+function removeName(button) {
+    const altNameField = button.closest('.alt-name-field');
+    altNameField.remove();
+}
+
+</script>
+
 {% endblock %}

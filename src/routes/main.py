@@ -1,15 +1,21 @@
 from flask import Blueprint, render_template
-from models.models import Book
+from models.models import Copy
+from models import db
 
 main_bp = Blueprint('main', __name__)
 
+# Index page
 @main_bp.route('/')
 def index():
-    books = Book.query.order_by(Book.created_date.desc()).limit(8)
-    for book in books:
-        print(f"{book.title}: {book.created_date}")
+    books = db.session.query(Copy).order_by(Copy.acquired.desc()).limit(10).all()
     return render_template('index.html', books=books)
 
+# Search page
 @main_bp.route('/search')
 def search_page():
     return render_template('search.html')
+
+# Error pages
+@main_bp.app_errorhandler(404)
+def error_page_404(error):
+    return render_template('404.html'), 404
