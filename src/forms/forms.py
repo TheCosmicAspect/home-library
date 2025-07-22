@@ -1,7 +1,6 @@
 from flask_wtf import FlaskForm
 from wtforms import FieldList, StringField, TextAreaField, SelectMultipleField, SubmitField, SelectField
 from wtforms.validators import DataRequired, Length, Optional
-from . import OptionalSelectField
 
 class BookForm(FlaskForm):
     title = StringField('Title')
@@ -35,7 +34,7 @@ class AuthorForm(FlaskForm):
 class TagForm(FlaskForm):
     label = StringField('Label', validators=[DataRequired()])
     description = TextAreaField('Description')
-    parent = OptionalSelectField('Parent', coerce=int, validators=[Optional()])
+    parent = SelectField('Parent', coerce=int, validators=[Optional()])
     type = StringField('Type', validators=[Length(max=50)])
     submit = SubmitField('Submit')
 

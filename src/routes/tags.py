@@ -20,21 +20,17 @@ def tag_detail(id):
 @tags_bp.route('/add', methods=['GET', 'POST'])
 def tag_add():
     form = TagForm()
+    form.parent.choices = [(0, '-none-')] + [(tag.id, tag.label) for tag in db.session.query(Tag).all()]
     
     if form.validate_on_submit():
-        if form.parent.data:
-            tag = Tag(
-                label=form.label.data,
-                description=form.description.data,
-                parent=form.parent.data,
-                type=form.type.data
-            )
-        else:
-            tag = Tag(
-                label=form.label.data,
-                description=form.description.data,
-                type=form.type.data
-            )
+        if form.parent.data == 0:
+            form.parent.data = None
+        tag = Tag(
+            label=form.label.data,
+            description=form.description.data,
+            parent_id=form.parent.data,
+            type=form.type.data
+        )
         db.session.add(tag)
         db.session.commit()
         flash('Tag added successfully!', 'success')
@@ -66,9 +62,10 @@ def tag_edit(id):
 
     return render_template('tag_form.html', form=form, title='Edit Tag')
 
+# Delete Tag
 @tags_bp.route('/<int:id>/delete', methods=['POST'])
 def tag_delete(id):
-    tag = Tag.query.get_or_404(id)
+    tag = db.session.query(Tag).get(id)
     db.session.delete(tag)
     db.session.commit()
     flash('Tag deleted successfully!', 'success')
