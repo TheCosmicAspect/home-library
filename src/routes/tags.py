@@ -43,6 +43,7 @@ def tag_add():
 def tag_edit(id):
     tag = db.session.query(Tag).get(id)
     form = TagForm(obj=tag)
+    form.parent.choices = [(0, '-none-')] + [(tag.id, tag.label) for tag in db.session.query(Tag).all()]
 
     if request.method == 'GET':
         form.label.data = tag.label
@@ -53,7 +54,7 @@ def tag_edit(id):
     if form.validate_on_submit():
         tag.label = form.label.data
         tag.description = form.description.data
-        tag.parent = form.parent.data
+        tag.parent_id = form.parent.data
         tag.type = form.type.data
 
         db.session.commit()

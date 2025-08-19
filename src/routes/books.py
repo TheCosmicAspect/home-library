@@ -14,33 +14,33 @@ def books():
 # Works
 @books_bp.route('/works')
 def work_list():
-    works = Work.query.all()
+    works = db.session.query(Work).all()
     return render_template('work_list.html', works=works)
 
 # Work detail
 @books_bp.route('/<int:id>')
 def work_detail(id):
-    work = Work.query.get_or_404(id)
+    work = db.session.query(Work).get(id)
     return render_template('work_detail.html', work=work)
 
 # Copies list
 @books_bp.route('/copies')
 def copies_list():
-    copies = Copy.query.all()
+    copies = db.session.query(Copy).all()
     return render_template('copies.html', copies=copies)
 
 # Copies
 @books_bp.route('/<int:work_id>/copies')
 def work_copies(work_id):
-    work = Work.query.get_or_404(work_id)
-    copies = Copy.query.filter_by(work_id=work_id).all()
+    work = db.session.query(Work).get(work_id)
+    copies = db.session.query(Copy).filter_by(work_id=work_id).all()
     return render_template('copies_list.html', work=work, copies=copies)
 
 # Copy detail
 @books_bp.route('/<int:work_id>/copies/<int:copy_id>')
 def copy_detail(work_id, copy_id):
-    work = Work.query.get_or_404(work_id)
-    copy = Copy.query.get_or_404(copy_id)
+    work = db.session.query(Work).get(work_id)
+    copy = db.session.query(Copy).get(copy_id)
     return render_template('copy_detail.html', work=work, copy=copy)
 
 # Add a new book
@@ -50,7 +50,7 @@ def book_add():
         
     if form.validate_on_submit():
         if not form.isbn.data:
-            return redirect(url_for('books.add_work'))
+            return redirect(url_for('books.work_add'))
         
         existing_work = db.session.query(Work).filter_by(isbn=form.isbn.data).first()
         if existing_work:
@@ -65,8 +65,8 @@ def book_add():
 @books_bp.route('/works/add', methods=['GET', 'POST'])
 def work_add(isbn=None):
     form = WorkForm()
-    form.authors.choices = [(a.id, a.name) for a in Author.query.all()]
-    form.tags.choices = [(t.id, t.label) for t in Tag.query.all()]
+    form.authors.choices = [(a.id, a.primary_name) for a in db.session.query(Author).all()]
+    form.tags.choices = [(t.id, t.label) for t in db.session.query(Tag).all()]
 
     # If coming from book_add with ISBN, prefill
     if isbn:
@@ -81,10 +81,10 @@ def work_add(isbn=None):
         )
 
         # Add authors
-        work.authors = Author.query.filter(Author.id.in_(form.authors.data)).all()
+        work.authors = db.session.query(Author).filter(Author.id.in_(form.authors.data)).all()
 
         # Add tags
-        work.tags = Tag.query.filter(Tag.id.in_(form.tags.data)).all()
+        work.tags = db.session.query(Tag).filter(Tag.id.in_(form.tags.data)).all()
 
         db.session.add(work)
         db.session.commit()

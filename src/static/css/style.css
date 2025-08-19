@@ -1,3 +1,8 @@
+/* EVERYTHING */
+body {
+    margin-bottom: 8em;
+}
+
 /* FORMS */
 .ts-wrapper.form-select {
     min-height: calc(1.5em + 0.75rem + 2px);

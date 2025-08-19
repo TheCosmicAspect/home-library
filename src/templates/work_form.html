@@ -1,0 +1,71 @@
+{% extends "base.html" %}
+
+{% block title %}{{ title }} - {{ super() }}{% endblock %}
+
+{% block content %}
+<h1>{{ title }}</h1>
+
+<form method="POST" class="mt-4">
+    {{ form.hidden_tag() }}
+    
+    <div class="mb-3">
+        {{ form.title.label(class="form-label") }}
+        {{ form.title(class="form-control") }}
+        {% if form.title.errors %}
+            {% for error in form.title.errors %}
+                <div class="text-danger">{{ error }}</div>
+            {% endfor %}
+        {% endif %}
+    </div>
+    
+    <div class="mb-3">
+        {{ form.isbn.label(class="form-label") }}
+        {{ form.isbn(class="form-control") }}
+        {% if form.isbn.errors %}
+            {% for error in form.isbn.errors %}
+                <div class="text-danger">{{ error }}</div>
+            {% endfor %}
+        {% endif %}
+    </div>
+
+    <div class="mb-3">
+        <div class="d-flex justify-content-between align-items-center">
+            {{ form.authors.label(class="form-label") }}
+            <button type="button" class="btn btn-sm btn-outline-primary" data-bs-toggle="modal" data-bs-target="#addAuthorModal">
+                <i class="fas fa-plus"></i> Add Author
+            </button>
+        </div>
+        {{ form.authors(class="form-select tom-select", multiple=true, placeholder="Search authors...") }}
+    </div>
+
+    <div class="mb-3">
+        {{ form.publisher.label(class="form-label") }}
+        {{ form.publisher(class="form-control") }}
+    </div>
+    
+    <div class="mb-3">
+        {{ form.description.label(class="form-label") }}
+        {{ form.description(class="form-control") }}
+    </div>
+    
+    <div class="mb-3">
+        <div class="d-flex justify-content-between align-items-center">
+            {{ form.tags.label(class="form-label") }}
+            <button type="button" class="btn btn-sm btn-outline-primary" data-bs-toggle="modal" data-bs-target="#addTagModal">
+                <i class="fas fa-plus"></i> Add Tag
+            </button>
+        </div>
+        {{ form.tags(class="form-select tom-select", multiple=true, placeholder="Search tags...") }}
+    </div>
+
+    <div class="mb-3">
+        {{ form.cover_url.label(class="form-label") }}
+        {{ form.cover_url(class="form-control") }}
+    </div>
+    
+    <div class="mb-3">
+        {{ form.submit(class="btn btn-primary") }}
+        <a href="{{ url_for('books.work_list') }}" class="btn btn-secondary">Cancel</a>
+    </div>
+</form>
+{% endblock %}

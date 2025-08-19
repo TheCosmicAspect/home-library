@@ -72,7 +72,7 @@
             <tr>
                 <td><a href="{{ url_for('books.work_detail', id=work.id) }}">{{ work.title }}</a></td>
                 <td>{{ work.isbn }}</td>
-                <td><a href="{{ url_for('books.work_copies', id=work.id) }}">{{ work.copies|length }} copies</a></td>
+                <td><a href="{{ url_for('books.work_copies', work_id=work.id) }}">{{ work.copies|length }} copies</a></td>
                 <td>
                     {% for author in work.authors %}
                     <a href="{{ url_for('authors.author_detail', id=author.id) }}" class="badge bg-primary text-decoration-none">{{ author.name|truncate(20) }}</a>
